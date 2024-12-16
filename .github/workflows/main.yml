@@ -11,7 +11,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Create sample file with just timestamp
-      run: date +%s >> report.txt
+      run: date +%s >> JustForFun.txt
     - name: Commit file
       run: |
           git config --global user.name "Phuong Van"
