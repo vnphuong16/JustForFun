@@ -15,34 +15,15 @@ jobs:
       # Checkout the repository
       - uses: actions/checkout@v4
 
-      # 1) Always update the file and commit it (daily commit guaranteed)
-      - name: Append timestamp to JustForFun.txt
-        run: date +%s >> JustForFun.txt
+      # Create a new file (overwrite each run)
+      - name: Create new JustForFun.txt
+        run: date +%s > JustForFun.txt
 
-      - name: Commit JustForFun.txt (always changed)
+      # Commit and push
+      - name: Commit & push
         run: |
           git config --global user.name "Phuong Van"
           git config --global user.email "vnphuong16@users.noreply.github.com"
           git add JustForFun.txt
-          git commit -m "Update JustForFun.txt on $(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+          git commit -m "Recreate JustForFun.txt on $(date -u +"%Y-%m-%dT%H:%M:%SZ")"
           git push
-
-      # 2) Backup today's snapshot and prune backups older than 7 days
-      - name: Backup today & prune >7d
-        run: |
-          set -euo pipefail
-          mkdir -p backup
-          # Copy current file to backup folder with date suffix (overwrite same-day snapshot)
-          cp JustForFun.txt "backup/JustForFun_$(date +%Y-%m-%d).txt"
-          # Delete backup files older than 7 days (based on mtime)
-          find backup -type f -name 'JustForFun_*.txt' -mtime +7 -print -delete
-
-      - name: Commit backup changes only if needed
-        run: |
-          git add backup/
-          if ! git diff --cached --quiet; then
-            git commit -m "Backup & prune (>7d) on $(date -u +"%Y-%m-%dT%H:%M:%SZ")"
-            git push
-          else
-            echo "No backup changes to commit"
-          fi
