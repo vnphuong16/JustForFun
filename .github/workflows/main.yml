@@ -3,8 +3,8 @@ name: Auto commit
 on:
   schedule:
     - cron: '0 2 * * *'   # 09:00 (UTC+7)
-    #- cron: '30 6 * * *'  # 13:30 (UTC+7)
-    #- cron: '12 9 * * *'  # 16:12 (UTC+7)
+    - cron: '30 6 * * *'  # 13:30 (UTC+7)
+    - cron: '12 9 * * *'  # 16:12 (UTC+7)
     - cron: '0 11 * * *'  # 18:00 (UTC+7)
 
 jobs:
