@@ -1,29 +1,34 @@
-name: Auto commit
+name: Auto commit (random times)
 
 on:
   schedule:
-    - cron: '0 2 * * *'   # 09:00 (UTC+7)
-    - cron: '30 6 * * *'  # 13:30 (UTC+7)
-    - cron: '12 9 * * *'  # 16:12 (UTC+7)
-    - cron: '0 11 * * *'  # 18:00 (UTC+7)
+    - cron: '0 1 * * *'  # run once a day at 08:00 (UTC+7)
 
 jobs:
-  auto_commit:
-    name: 'Auto push a commit to my repo'
+  random_commit:
     runs-on: macos-latest
     steps:
-      # Checkout the repository
       - uses: actions/checkout@v4
 
-      # Create a new file (overwrite each run)
-      - name: Create new JustForFun.txt
-        run: date +%s > JustForFun.txt
-
-      # Commit and push
-      - name: Commit & push
+      - name: Generate random commits (2–10 times/day)
         run: |
           git config --global user.name "Phuong Van"
           git config --global user.email "vnphuong16@users.noreply.github.com"
-          git add JustForFun.txt
-          git commit -m "Recreate JustForFun.txt on $(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+
+          count=$(( (RANDOM % 9) + 2 ))  # random 2–10 commits
+          echo "Will make $count commits today"
+
+          for i in $(seq 1 $count); do
+            echo "$(date +%s)" > JustForFun.txt
+            git add JustForFun.txt
+            git commit -m "Random commit #$i on $(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+
+            # skip sleep after the last commit
+            if [ $i -lt $count ]; then
+              delay=$(( (RANDOM % 26 + 5) * 60 ))  # 5–30 minutes
+              echo "Sleeping for $((delay / 60)) minutes..."
+              sleep $delay
+            fi
+          done
+
           git push
