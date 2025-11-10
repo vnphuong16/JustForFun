@@ -26,9 +26,8 @@ jobs:
 
             # skip sleep after the last commit
             if [ $i -lt $count ]; then
-              delay=$(( (RANDOM % 26 + 5) * 60 ))  # 5–30 minutes
-              echo "Sleeping for $((delay / 60)) minutes..."
-              sleep $delay
+              echo "Sleeping for 10 seconds..."
+              sleep 10
             fi
           done
 
