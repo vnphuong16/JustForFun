@@ -3,28 +3,36 @@ name: Auto commit (random times)
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 1 * * *'  # run once a day at 08:00 (UTC+7)
+    - cron: '0 1 * * *'  # 08:00 (UTC+7)
+
+permissions:
+  contents: write
 
 jobs:
   random_commit:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+          fetch-depth: 0
 
-      - name: Generate random commits (2–10 times/day)
+      - name: Generate commits (2–10, 10s apart)
+        shell: bash
         run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
           git config --global user.name "Phuong Van"
           git config --global user.email "vnphuong16@users.noreply.github.com"
 
-          count=$(( (RANDOM % 9) + 2 ))  # random 2–10 commits
+          count=$(( (RANDOM % 9) + 2 ))
           echo "Will make $count commits today"
 
           for i in $(seq 1 $count); do
-            echo "$(date +%s)" > JustForFun.txt
+            date +%s > JustForFun.txt
             git add JustForFun.txt
             git commit -m "Random commit #$i on $(date -u +"%Y-%m-%dT%H:%M:%SZ")"
 
-            # skip sleep after the last commit
             if [ $i -lt $count ]; then
               echo "Sleeping for 10 seconds..."
               sleep 10
